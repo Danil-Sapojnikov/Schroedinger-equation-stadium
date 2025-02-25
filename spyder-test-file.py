@@ -8,18 +8,19 @@ import matplotlib.pylab as plt
 
 yaxis = np.empty((0,1))
 
-n = 100
+dim = 10
+n = dim**2
 d = np.ones(n) #diagonals
 b = np.zeros(n) #RHS
-d0 = d*(4) #main diagonal
+d0 = d*(-4) #main diagonal
 d1 = d[0:-1] #second diagonal
-d5 = d[0:-5]
+d5 = d[0:-dim] #l'th diagonal
 
-M = scipy.sparse.diags([d0, d1, d1, d5, d5], [0, 1, -1, n, -n], format='csc')
+M = scipy.sparse.diags([d0, d1, d1, d5, d5], [0, 1, -1, dim, -dim], format='csc')
 
-#M[0,:], M[24,:], M[:,0], M[:,24] = 1000, 1000, 1000, 1000
-
-eig = scipy.sparse.linalg.eigs(M)
+eig = scipy.sparse.linalg.eigs(M, k=n-2)
 
 evals = eig[0]
 evecs = eig[1]
+
+

@@ -6,7 +6,6 @@ Created on Tue Mar  4 14:37:04 2025
 """
 
 import numpy as np
-
 import scipy.linalg
 import scipy.sparse
 import scipy.sparse.linalg
@@ -16,10 +15,11 @@ SAVE_FIGURE = False
 FIGURE_NAME = 'Size_accuracy_plot'
 
 L = 1 # length of box
-n = 1000 # number of points along each axis of box
+n = 200 # number of points along each axis of box
+delta = L/n # size of discrete element
 
-epsilon = 10e-5
-U_0 = 10e5
+epsilon = 10e-3
+U_0 = 10e3
 
 def plot_figure(size, ediffSet):
 
@@ -46,16 +46,27 @@ def plot_figure(size, ediffSet):
 
     return
 
-def circ_potential(x,y,L):
+def circ_potential(diag):
+    
+    j = np.linspace(0,m-1,m)
+    y = -L/2 + (np.trunc(j/n)) * delta
+    
+    i = j - n * np.trunc(j/n)
+    x = -L/2 + i * delta
     
     r = np.sqrt(x**2+y**2)
     
-    return U_0 * 
+    return U_0 * np.tanh((r - L/2)/epsilon)
     
 #discretise axis
 m = n**2
 diag = np.ones(m) #diagonals
-diag0 = diag*(-4) #main diagonal
+ 
+
+#x = + i*delta
+#y = + j*delta
+
+diag0 = diag*(-4) - circ_potential(diag) #main diagonal
 diag1 = diag[0:-1] #second diagonal
 diag1_bounding = diag1[n-1::n]
 diag1_bounding[:] = 0 #prevents looping of wavefunction around box
@@ -66,6 +77,6 @@ M = scipy.sparse.diags([diag0, diag1, diag1, diagk, diagk], [0, 1, -1, n, -n], f
 
 #Solve for Eigenvalues
 #evals, evecs = scipy.sparse.linalg.eigs(M, k=10, which='SM')
-evals, evecs = scipy.sparse.linalg.eigsh(M, sigma=0, k=10, which='LM',tol = 1e-5)
+evals, evecs = scipy.sparse.linalg.eigsh(M, sigma=0, k=100, which='LM')
 
-evals_sorted = -np.flip(np.sort(evals)) * (n+1)**2 / np.pi**2
+evals_sorted = -np.flip(np.sort(evals)) * (1/delta)**2 

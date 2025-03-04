@@ -44,7 +44,7 @@ nStates = np.array((2,5,5,8,10,10,13,13,17,17))
 
 
 
-for n in range(100, 1001, 20):
+for n in range(10, 101, 1):
     
     #discretise axis
     m = n**2
@@ -63,7 +63,7 @@ for n in range(100, 1001, 20):
     evals, evecs = scipy.sparse.linalg.eigsh(M, sigma=0, k=10, which='LM',tol = 1e-5)
     
     #evals_sorted = np.flip(np.sort(evals))
-    evals_sorted = -np.flip(np.sort(evals)) * (n+1)**2 / np.pi**2
+    evals_sorted = -np.flip(np.sort(evals)) * (n)**2 / np.pi**2
     
     #Stack Eigenvalues for comparison graph
     size = np.hstack((size,n))
@@ -71,10 +71,10 @@ for n in range(100, 1001, 20):
     #analyticVal = np.pi**2 * nStates
     #analyticVal = np.pi**2/dim**2 * nStates
     
-    ediff = evals_sorted/nStates
+    #ediff = evals_sorted/nStates
     #ediff = evals_sorted/analyticVal
     #ediff = analyticVal/evals_sorted
-    #ediff = evals_sorted
+    ediff = evals_sorted
     
     ediffSet = np.vstack((ediffSet, ediff))
 

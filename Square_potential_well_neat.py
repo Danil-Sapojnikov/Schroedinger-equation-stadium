@@ -1,28 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar  4 14:37:04 2025
+Created on Fri Mar  7 15:00:58 2025
 
 @author: danil
 """
 
 import numpy as np
+import scipy
 import scipy.linalg
 import scipy.sparse
 import scipy.sparse.linalg
 import matplotlib.pyplot as plt
+#import matplotlib.pylab as plt
 
 SAVE_FIGURE = False
 FIGURE_NAME = 'Size_accuracy_plot'
 
-L = 1 # length of box
-N = 100 # number of points along each axis of box
-delta = L/N # size of discrete element
-
-#contour_n = 0
-Num_Eig = 10
-
-epsilon = 10e-5
-U_0 = 10e5
 
 def plot_figure(size, ediffSet):
 
@@ -70,38 +63,18 @@ def plot_contour(XX, YY, prob, contour_N):
 
     return
 
-def circ_potential(diag):
-    
-    j = np.linspace(0,m-1,m)
-    y = -L/2 + (np.trunc(j/N)) * delta
-    
-    i = j - N * np.trunc(j/N)
-    x = -L/2 + i * delta
-    
-    r = np.sqrt(x**2+y**2)
-    
-    return U_0 * np.tanh((r - L/2)/epsilon) +U_0
-    
+#nStates = np.array((2,5,5,8,10,10,13,13,17,17))
+N = 100
+L = 1
+delta = L/N
+
+Num_Eig = 100
+#contour_n = 0
+
 #discretise axis
 m = N**2
 diag = np.ones(m) #diagonals
-
-#temp potential plot
-
-#l = circ_potential(diag)
-#l_sqr = np.reshape(l, (-1, N))
-
-#Define grid for contours
-axis_x = np.linspace(-L/2, L/2 - delta, N)
-axis_y = axis_x
-XX, YY = np.meshgrid(axis_x, axis_y)
-
-#plot_contour(XX, YY, l_sqr, contour_n)
-
-#x = + i*delta
-#y = + j*delta
-
-diag0 = diag*(-4) - circ_potential(diag) #main diagonal
+diag0 = diag*(-4) #main diagonal
 diag1 = diag[0:-1] #second diagonal
 diag1_bounding = diag1[N-1::N]
 diag1_bounding[:] = 0 #prevents looping of wavefunction around box
@@ -114,7 +87,13 @@ M = scipy.sparse.diags([diag0, diag1, diag1, diagk, diagk], [0, 1, -1, N, -N], f
 #evals, evecs = scipy.sparse.linalg.eigs(M, k=10, which='SM')
 evals, evecs = scipy.sparse.linalg.eigsh(M, sigma=0, k=Num_Eig, which='LM')
 
-evals_sorted = -np.flip(np.sort(evals)) * (1/delta)**2 
+#evals_sorted = np.flip(np.sort(evals))
+evals_sorted = -np.flip(np.sort(evals)) * (N)**2 / np.pi**2
+
+#Contour plot of wavefunction
+axis_x = np.linspace(-L/2, L/2 - delta, N)
+axis_y = axis_x
+XX, YY = np.meshgrid(axis_x, axis_y)
 
 for contour_n in range(0, Num_Eig):
 
